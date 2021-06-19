@@ -1,14 +1,14 @@
 import thunkMiddleware from 'redux-thunk';
 import { applyMiddleware, combineReducers, createStore } from 'redux';
 
+import { timesReducer } from "./ducks/times";
 import { usersReadReducer } from "./ducks/users";
 import { projectsReadReducer } from "./ducks/projects";
-import { tracerReducer } from "./ducks/tracker";
 
 export const appReducer = combineReducers({
+  times: timesReducer,
   usersRead: usersReadReducer,
   projectsRead: projectsReadReducer,
-  tracer: tracerReducer,
 });
 
 export const store = createStore(appReducer, applyMiddleware(thunkMiddleware));

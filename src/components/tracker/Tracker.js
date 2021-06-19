@@ -1,27 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { fetchUsersRead } from "../../store/ducks/users";
 import { useDispatch, useSelector } from 'react-redux';
-import Menu from "../menu/menu";
 import ReactSelect from 'react-select';
 import { filterOption } from "../../utils";
+import { deleteTime, fetchTimesRead, trackTime } from "../../store/ducks/times";
+import { fetchProjectsRead } from "../../store/ducks/projects";
 
 const Tracker = () => {
   const dispatch = useDispatch();
 
-  const { dataUsersRead, loadingUsersRead } = useSelector(state => state.usersRead)
+  const { times } = useSelector(state => state.times)
   const { dataProjectsRead } = useSelector(state => state.projectsRead)
-
+  const { dataUsersRead, loadingUsersRead } = useSelector(state => state.usersRead)
 
   const [userOptions, setUserOptions] = useState([])
-  const [user, setUser] = useState({ value: '', label: 'User Name' })
-
   const [projectOptions, setProjectOptions] = useState([])
-  const [project, setProject] = useState({ value: '', label: 'Project Name' })
 
+  const [user, setUser] = useState({ value: '', label: 'User Name' })
+  const [project, setProject] = useState({ value: '', label: 'Project Name' })
   const [honours, setHonours] = useState();
 
   useEffect(() => {
     dispatch(fetchUsersRead())
+    dispatch(fetchTimesRead())
+    dispatch(fetchProjectsRead())
   }, [])
 
   useEffect(() => {
@@ -36,22 +38,26 @@ const Tracker = () => {
     }
   }, [dataProjectsRead])
 
-  const submit = () => {
+  const submit = (e) => {
+    e.preventDefault()
+    if (user.value && project.value && honours) {
+      dispatch(trackTime({ userId: user.value, projectId: project.value, honours }))
 
+      setProject({ value: '', label: 'Project Name' })
+      setUser({ value: '', label: 'User Name' })
+      setHonours('')
+    }
   }
 
   return (
     <>
-      <Menu/>
-      <br/>
-      <br/>
       <form onSubmit={submit}>
         <label>
           <div>Select User</div>
           <ReactSelect
             isDisabled={loadingUsersRead}
             classNamePrefix="react-select"
-            onChange={(e) => setUser(e.id)}
+            onChange={setUser}
             filterOption={filterOption}
             value={user}
             options={userOptions?.length ? (
@@ -75,7 +81,7 @@ const Tracker = () => {
           <div>Select Project</div>
           <ReactSelect
             classNamePrefix="react-select"
-            onChange={(e) => setProject(e.id)}
+            onChange={setProject}
             filterOption={filterOption}
             value={project}
             options={projectOptions?.length ? (
@@ -100,10 +106,41 @@ const Tracker = () => {
           <input
             type="number"
             value={honours}
-            onChange={(e) => setHonours(e.target.value)}
+            onChange={(e) => {
+              setHonours(e.target.value)
+            }}
           />
         </label>
+        <br/>
+        <br/>
+        <button type={'submit'}>Submit</button>
       </form>
+
+      <br/>
+      <hr/>
+      <br/>
+
+      {dataUsersRead && dataProjectsRead && times?.length ? (
+        <div>
+          <h3>Tracker List</h3>
+          {times.map(time => (
+            <div>
+              <h4>
+                User: {dataUsersRead.find(({ id }) => id === time.userId)?.name || time.userId}
+              </h4>
+              <div>
+                Project: {dataProjectsRead.find(({ id }) => id === time.projectId)?.name || time.projectId}
+              </div>
+              <div>
+                Spend Time: {time.honours}
+              </div>
+              <div>
+                <button onClick={() => dispatch(deleteTime(time.id))}>Delete</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : ''}
     </>
   );
 }

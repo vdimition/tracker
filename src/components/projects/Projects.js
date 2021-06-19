@@ -1,32 +1,52 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteProject } from "../../store/ducks/projects";
-import Menu from "../menu/menu";
+import { addProject, deleteProject, fetchProjectsRead } from "../../store/ducks/projects";
 
 const Projects = () => {
   const dispatch = useDispatch();
 
   const { dataProjectsRead } = useSelector(state => state.projectsRead)
 
+  const [name, setName] = useState('')
+
+  useEffect(() => {
+    dispatch(fetchProjectsRead())
+  }, [])
+
+  const submit = (e) => {
+    e.preventDefault()
+
+    if (name) {
+      dispatch(addProject({ name }))
+      setName('')
+    }
+  }
+
   return (
-    <>
-      <Menu/>
+    <div>
       <div>
-        {dataProjectsRead?.length ? dataProjectsRead.map(({ id, name }) => (
-          <div key={id}>
-            <h3>{name}</h3>
-            <button onClick={() => dispatch(deleteProject(id))}>Delete</button>
-          </div>
-        )) : (
-          <div>
-            <h3>No Project Found.</h3>
-            <div>
-              <button>Add New</button>
-            </div>
-          </div>
-        )}
+        <form onSubmit={submit}>
+          <label>
+            <div>Name:</div>
+            <input type="text" value={name} onChange={(e) => setName(e.target.value)}/>
+          </label>
+          <br/>
+          <br/>
+          <button type={'submit'}>Add New</button>
+        </form>
       </div>
-    </>
+      <br/>
+      <hr/>
+      <br/>
+      {dataProjectsRead?.length ? dataProjectsRead.map(({ id, name }) => (
+        <div key={id}>
+          <div>{name}</div>
+          <button onClick={() => dispatch(deleteProject(id))}>Delete</button>
+          <br/>
+          <br/>
+        </div>
+      )) : ''}
+    </div>
   );
 }
 

@@ -1,15 +1,18 @@
 import React from 'react';
 import Users from "./components/users/Users";
-
 import { Route, Switch } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
+
 import Projects from "./components/projects/Projects";
 import Tracker from "./components/tracker/Tracker";
 import Home from "./components/home/Home";
+import Menu from "./components/menu/menu";
 
 const App = () => (
-
   <BrowserRouter>
+    <Menu/>
+    <br/>
+
     <Switch>
       <Route path="/users">
         <Users/>

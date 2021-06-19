@@ -5,6 +5,7 @@ import ReactSelect from 'react-select';
 import { filterOption } from "../../utils";
 import { deleteTime, fetchTimesRead, trackTime } from "../../store/ducks/times";
 import { fetchProjectsRead } from "../../store/ducks/projects";
+import { NavLink } from "react-router-dom";
 
 const Tracker = () => {
   const dispatch = useDispatch();
@@ -124,13 +125,14 @@ const Tracker = () => {
         <div>
           <h3>Tracker List</h3>
           {times.map(time => (
-            <div>
-              <h4>
+            <div key={time.id}>
+              <NavLink to={`/users?id=${time.userId}`}>
                 User: {dataUsersRead.find(({ id }) => id === time.userId)?.name || time.userId}
-              </h4>
-              <div>
+              </NavLink>
+              <br/>
+              <NavLink to={`/projects?id=${time.projectId}`}>
                 Project: {dataProjectsRead.find(({ id }) => id === time.projectId)?.name || time.projectId}
-              </div>
+              </NavLink>
               <div>
                 Spend Time: {time.honours}
               </div>

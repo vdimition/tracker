@@ -52,7 +52,7 @@ const Tracker = () => {
 
   return (
     <>
-      <form onSubmit={submit}>
+      <form onSubmit={submit} style={{maxWidth: '500px'}}>
         <label>
           <div>Select User</div>
           <ReactSelect
